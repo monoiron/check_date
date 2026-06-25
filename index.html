@@ -318,7 +318,6 @@
 </head>
 <body>
 
-<!-- Aurora -->
 <div class="aurora">
   <div class="aurora-blob b1"></div>
   <div class="aurora-blob b2"></div>
@@ -391,6 +390,9 @@
     </button>
   </div>
 
+  <div class="foot">Кліринг MasterCard: Покупки враховуються не за датою в застосунку, а коли проходить фінальний розрахунок з магазином. Через це покупка може бути у виписці за потрібний період, але не врахуватись для доступу до бізнес-залу саме в день поїздки. Завжди перевіряйте доступність послуги в застосунку прямо перед вильотом</div>
+</div>
+
 <div class="toast" id="toast">Скопійовано</div>
 
 <script>
@@ -461,17 +463,17 @@
   }
 
   copyOk.addEventListener('click', () => {
-    navigator.clipboard.writeText(`Треба витратити від 10 000 грн у період: ${state.okText}`)
+    navigator.clipboard.writeText(`${state.card}: Треба витратити від 10 000 грн у період: ${state.okText}`)
       .then(() => { flashBtn(copyOk); showToast('Скопійовано'); });
   });
 
   copyNo.addEventListener('click', () => {
-    navigator.clipboard.writeText(`З ${state.noText.replace(' — ', ' по ')} витрати не рахуватимуться`)
+    navigator.clipboard.writeText(`${state.card}: З ${state.noText.replace(' — ', ' по ')} витрати не рахуватимуться`)
       .then(() => { flashBtn(copyNo); showToast('Скопійовано'); });
   });
 
   copyAll.addEventListener('click', () => {
-    navigator.clipboard.writeText(`Треба витратити від 10 000 грн у період: ${state.okText}\nА з ${state.noText.replace(' — ', ' по ')} витрати не рахуватимуться`)
+    navigator.clipboard.writeText(`${state.card}: Треба витратити від 10 000 грн у період: ${state.okText}\nА з ${state.noText.replace(' — ', ' по ')} витрати не рахуватимуться`)
       .then(() => showToast('Все скопійовано ✓'));
   });
 
