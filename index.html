@@ -4,316 +4,192 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DragonPass / LoungeKey</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --surface:  #0F1117;
-      --card:     rgba(255,255,255,0.06);
-      --card-bd:  rgba(255,255,255,0.1);
-      --ink:      #F0EEE8;
-      --ink2:     #9B97A0;
-      --ink3:     #5A5760;
-      --ok:       #4ADE80;
-      --ok-bg:    rgba(74,222,128,0.08);
-      --ok-bd:    rgba(74,222,128,0.25);
-      --no:       #F87171;
-      --no-bg:    rgba(248,113,113,0.08);
-      --no-bd:    rgba(248,113,113,0.25);
-      --sans:     'IBM Plex Sans', sans-serif;
-      --mono:     'IBM Plex Mono', monospace;
+      color-scheme: dark;
+      --surface: #0B0D14; --card: rgba(18,16,34,0.62); --card-bd: rgba(255,255,255,0.10);
+      --ink: #F2F0EA; --ink2: #A29EAB; --ink3: #6B6874;
+      --acc: #A78BFA; --acc-rgb: 139,92,246;
+      --ok: #4ADE80; --ok-bg: rgba(74,222,128,0.08); --ok-bd: rgba(74,222,128,0.28);
+      --no: #F87171; --no-bg: rgba(248,113,113,0.08); --no-bd: rgba(248,113,113,0.28);
+      --warn: #FBBF24;
+      --sans: 'IBM Plex Sans', system-ui, sans-serif;
+      --mono: 'IBM Plex Mono', ui-monospace, monospace;
     }
-
-    body {
-      background: var(--surface);
-      font-family: var(--sans);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 16px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* ── Aurora background ── */
-    .aurora {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .aurora-blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      mix-blend-mode: screen;
-      animation: drift linear infinite;
-      opacity: 0.55;
-    }
-
-    .b1 { width: 520px; height: 520px; background: #3B1FA8; top: -160px; left: -80px;  animation-duration: 22s; animation-delay: 0s; }
-    .b2 { width: 400px; height: 400px; background: #0E6E8A; top: 10%;   right: -100px; animation-duration: 28s; animation-delay: -8s; }
-    .b3 { width: 460px; height: 300px; background: #6B21A8; bottom: -80px; left: 20%;  animation-duration: 18s; animation-delay: -4s; }
-    .b4 { width: 300px; height: 300px; background: #0D4F6C; bottom: 5%;  right: 5%;   animation-duration: 24s; animation-delay: -12s; }
-    .b5 { width: 200px; height: 200px; background: #7C3AED; top: 40%;   left: 40%;   animation-duration: 16s; animation-delay: -6s; }
-
+    body { background: var(--surface); color: var(--ink); font-family: var(--sans); min-height: 100vh; padding: 40px 16px; overflow-x: hidden; }
+    ::selection { background: rgba(var(--acc-rgb),0.3); color: #fff; }
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid rgba(var(--acc-rgb),0.7); outline-offset: 2px; }
+    hr { border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 18px 0; }
+    .aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+    .aurora-blob { position: absolute; border-radius: 50%; filter: blur(90px); mix-blend-mode: screen; opacity: 0.5; animation: drift linear infinite; }
+    .b1 { width: 520px; height: 520px; background: #3B1FA8; top: -160px; left: -80px; animation-duration: 22s; }
+    .b2 { width: 400px; height: 400px; background: #0E6E8A; top: 10%; right: -100px; animation-duration: 28s; animation-delay: -8s; }
+    .b3 { width: 460px; height: 300px; background: #6B21A8; bottom: -80px; left: 20%; animation-duration: 18s; animation-delay: -4s; }
+    .b4 { width: 300px; height: 300px; background: #0D4F6C; bottom: 5%; right: 5%; animation-duration: 24s; animation-delay: -12s; }
+    .b5 { width: 200px; height: 200px; background: #7C3AED; top: 40%; left: 40%; animation-duration: 16s; animation-delay: -6s; }
     @keyframes drift {
-      0%   { transform: translate(0, 0)   scale(1); }
-      33%  { transform: translate(40px, -30px) scale(1.08); }
-      66%  { transform: translate(-30px, 20px) scale(0.95); }
-      100% { transform: translate(0, 0)   scale(1); }
+      0%   { transform: translate(0,0) scale(1); }
+      33%  { transform: translate(40px,-30px) scale(1.08); }
+      66%  { transform: translate(-30px,20px) scale(0.95); }
+      100% { transform: translate(0,0) scale(1); }
     }
-
-    /* subtle noise overlay */
-    .noise {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 200px 200px;
+    .noise { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+    .wrap { position: relative; z-index: 2; width: 100%; max-width: 1240px; margin: 0 auto; }
+    .layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,600px) minmax(0,1fr); column-gap: 24px; align-items: start; }
+    .main { grid-column: 2; position: relative; z-index: 2; min-width: 0; }
+    .side { grid-column: 3; }
+    @media (max-width: 1240px) {
+      .layout { grid-template-columns: minmax(0,600px); justify-content: center; row-gap: 18px; }
+      .main, .side { grid-column: 1; }
     }
-
-    /* ── Layout ── */
-    .wrap {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 620px;
-    }
-
-    .header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 22px;
-      padding: 0 2px;
-    }
-
-    .logo-name {
-      font-family: var(--mono);
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--ink);
-      letter-spacing: -0.2px;
-    }
-
-    .logo-sub {
-      font-size: 11px;
-      color: var(--ink3);
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      margin-top: 3px;
-    }
-
+    .header { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 22px; }
+    .logo-name { font-family: var(--mono); font-size: 22px; font-weight: 500; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 12px; color: var(--ink3); margin-top: 3px; }
     .plane-box {
-      width: 64px; height: 64px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      backdrop-filter: blur(8px);
+      width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; cursor: pointer; color: #fff;
+      background: rgba(139,92,246,0.22); border: 1px solid rgba(167,139,250,0.38);
+      transition: border-color .15s, background .15s;
     }
-
-    .plane-box svg { color: rgba(255,255,255,0.9); }
-
-    /* ── Card ── */
+    .plane-box:hover { border-color: rgba(167,139,250,0.6); background: rgba(139,92,246,0.32); }
+    .plane-box svg { width: 24px; height: 24px; }
+    @keyframes spin-out {
+      0%   { transform: rotate(0deg); }
+      30%  { transform: rotate(540deg); }
+      100% { transform: rotate(720deg); }
+    }
+    .plane-box.spinning svg { animation: spin-out 1s cubic-bezier(0.2, 0.8, 0.4, 1) forwards; }
     .card {
-      background: var(--card);
-      border: 1px solid var(--card-bd);
-      border-radius: 20px;
-      padding: 36px;
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      position: relative; padding: 22px; border-radius: 20px; background: var(--card); border: 1px solid var(--card-bd);
+      box-shadow: 0 24px 60px -24px rgba(0,0,0,0.6);
     }
-
-    .field { margin-bottom: 16px; }
-    .field:last-child { margin-bottom: 0; }
-
-    .field-label {
-      display: block;
-      font-size: 10.5px;
-      font-weight: 600;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: var(--ink2);
-      margin-bottom: 7px;
+    .field-label { display: block; font-size: 12px; font-weight: 500; color: var(--ink2); margin-bottom: 8px; }
+    input[type="date"] {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      color: var(--ink); font-family: var(--mono); font-size: 15px; padding: 11px 14px; outline: none;
+      transition: border-color .15s, background .15s, box-shadow .15s;
     }
-
-    .field-ctrl { position: relative; }
-
-    select, input[type="date"] {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 10px;
-      color: var(--ink);
-      font-family: var(--mono);
-      font-size: 16px;
-      padding: 13px 40px 13px 16px;
-      outline: none;
-      appearance: none;
-      -webkit-appearance: none;
-      transition: border-color 0.15s, background 0.15s;
+    input[type="date"]:focus { border-color: rgba(var(--acc-rgb),0.7); background: rgba(255,255,255,0.08); box-shadow: 0 0 0 4px rgba(var(--acc-rgb),0.14); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+    .providers { display: grid; gap: 12px; }
+    .prov { position: relative; isolation: isolate; border: 1px solid rgba(255,255,255,0.09); background: rgba(255,255,255,0.03); border-radius: 14px; padding: 14px; transition: border-color .2s, background .2s; }
+    .prov::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--glow); }
+    .prov:hover { border-color: rgba(255,255,255,0.16); background: rgba(255,255,255,0.045); }
+    .prov-visa {
+      --glow: radial-gradient(100% 130% at 0% 0%, rgba(59,91,255,0.20), transparent 58%), radial-gradient(100% 130% at 100% 100%, rgba(247,182,0,0.10), transparent 58%);
+      border-color: rgba(99,130,255,0.28);
     }
-
-    select:focus, input[type="date"]:focus {
-      border-color: rgba(124,58,237,0.6);
-      background: rgba(255,255,255,0.08);
+    .prov-visa:hover { border-color: rgba(99,130,255,0.45); }
+    .prov-mc {
+      --glow: radial-gradient(100% 130% at 0% 0%, rgba(235,0,27,0.16), transparent 58%), radial-gradient(100% 130% at 100% 100%, rgba(247,158,27,0.15), transparent 58%);
+      border-color: rgba(247,158,27,0.26);
     }
-
-    select option { background: #1a1a2e; color: var(--ink); }
-
-    .field-ctrl::after {
-      content: '↓';
-      position: absolute;
-      right: 12px; top: 50%;
-      transform: translateY(-50%);
-      color: var(--ink3);
-      font-size: 11px;
-      pointer-events: none;
+    .prov-mc:hover { border-color: rgba(247,158,27,0.42); }
+    .prov-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
+    .prov-id { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .prov-name { font-family: var(--mono); font-size: 15px; font-weight: 500; }
+    .prov-name span { color: var(--ink3); font-weight: 400; }
+    .ps { width: 44px; flex: none; transform: rotate(var(--r)); filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)); animation: ps-float 7s ease-in-out infinite; }
+    .prov-mc .ps { animation-duration: 9s; animation-delay: -3.5s; }
+    .ps svg { display: block; width: 100%; height: auto; }
+    @keyframes ps-float {
+      0%, 100% { transform: translate(0,0) rotate(var(--r)); }
+      50%      { transform: translate(2px,-4px) rotate(calc(var(--r) * -0.5)); }
     }
-
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.6);
-      cursor: pointer;
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 100px; color: var(--ink); font-family: var(--sans); font-size: 12px; padding: 6px 12px; cursor: pointer;
+      transition: background .15s, transform .1s, border-color .15s, color .15s;
     }
-
-    hr {
-      border: none;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      margin: 20px 0;
-    }
-
-    /* ── Results ── */
-    .results { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .result-block {
-      border-radius: 12px;
-      padding: 18px;
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.03);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: border-color 0.2s;
-    }
-
-    .result-block.ok { border-color: var(--ok-bd); background: var(--ok-bg); }
-    .result-block.no { border-color: var(--no-bd); background: var(--no-bg); }
-
-    .rb-head { display: flex; align-items: center; justify-content: space-between; }
-
-    .rb-tag {
-      font-size: 9.5px;
-      font-weight: 600;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-    }
-
-    .result-block.ok .rb-tag { color: var(--ok); }
-    .result-block.no .rb-tag { color: var(--no); }
-
-    .rb-copy {
-      background: none;
-      border: 1px solid transparent;
-      border-radius: 5px;
-      cursor: pointer;
-      padding: 3px 5px;
-      display: flex;
-      align-items: center;
-      color: var(--ink3);
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
-    }
-
-    .result-block.ok .rb-copy:hover { color: var(--ok); border-color: var(--ok-bd); background: rgba(74,222,128,0.1); }
-    .result-block.no .rb-copy:hover { color: var(--no); border-color: var(--no-bd); background: rgba(248,113,113,0.1); }
-    .rb-copy:disabled { opacity: 0.25; cursor: default; }
-
-    .rb-sub {
-      font-size: 10px;
-      letter-spacing: 0.03em;
-    }
-
-    .result-block.ok .rb-sub { color: rgba(74,222,128,0.55); }
-    .result-block.no .rb-sub { color: rgba(248,113,113,0.55); }
-
-    .rb-value {
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 500;
-      line-height: 1.7;
-      white-space: pre;
-    }
-
-    .result-block.ok .rb-value { color: var(--ok); }
-    .result-block.no .rb-value { color: var(--no); }
-    .rb-value.empty { color: var(--ink3); font-size: 16px; white-space: normal; }
-
-    /* ── Copy all ── */
+    .pill:hover { background: rgba(255,255,255,0.14); }
+    .pill:active { transform: scale(0.97); }
+    .pill:disabled { opacity: 0.25; cursor: default; transform: none; }
+    .pill.done { border-color: var(--ok-bd); color: var(--ok); }
+    .rows { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row { border-radius: 10px; padding: 10px 12px; border: 1px solid; }
+    .row.ok   { border-color: var(--ok-bd); background: var(--ok-bg); }
+    .row.no   { border-color: var(--no-bd); background: var(--no-bg); }
+    .row.warn { border-color: rgba(251,191,36,.3); background: rgba(251,191,36,.08); }
+    .row .tag { display: block; font-size: 11px; font-weight: 500; margin-bottom: 6px; }
+    .row.ok .tag, .row.ok .dates, .row.ok .big { color: var(--ok); }
+    .row.no .tag, .row.no .dates, .row.no .big { color: var(--no); }
+    .row.warn .tag, .row.warn .dates, .row.warn .big { color: var(--warn); }
+    .dates { font-family: var(--mono); font-size: 13.5px; font-weight: 500; line-height: 1.6; white-space: pre; }
+    .big { font-family: var(--mono); font-weight: 500; line-height: 1.1; }
+    .msg { margin-top: 11px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); font-size: 12.5px; line-height: 1.6; color: var(--ink2); }
+    .actions { display: flex; gap: 8px; margin-top: 16px; }
     .copy-all {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 11px;
-      color: var(--ink);
-      font-family: var(--sans);
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: background 0.15s, transform 0.1s;
-      backdrop-filter: blur(8px);
+      flex: 1; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; color: #fff; background: #6D4BD8;
+      font-family: var(--sans); font-size: 14px; font-weight: 500;
+      transition: background .15s, transform .1s;
     }
-
-    .copy-all:hover { background: rgba(255,255,255,0.16); }
+    .copy-all:hover { background: #7A59E4; }
     .copy-all:active { transform: scale(0.98); }
     .copy-all:disabled { opacity: 0.25; cursor: default; transform: none; }
-
-    /* ── Footer ── */
-    .foot {
-      text-align: center;
-      font-size: 11px;
-      color: var(--ink3);
-      letter-spacing: 0.04em;
-      margin-top: 16px;
+    .copy-all.done { background: var(--ok-bg); border-color: var(--ok-bd); color: var(--ok); }
+    .ghost {
+      display: inline-flex; align-items: center; gap: 7px; padding: 12px 14px; background: transparent; border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px; color: var(--ink2); font-family: var(--sans); font-size: 13px; cursor: pointer; white-space: nowrap;
+      transition: color .15s, border-color .15s, background .15s;
     }
+    .ghost:hover { color: var(--ink); border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
 
-    /* ── Toast ── */
+    details { margin-top: 14px; font-size: 12.5px; color: var(--ink3); }
+    summary { cursor: pointer; transition: color .15s; }
+    summary:hover { color: var(--ink2); }
+    details pre { margin-top: 10px; padding: 14px; background: rgba(0,0,0,0.28); border-radius: 12px; color: var(--ink2); font-family: var(--sans); font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+    .foot { margin-top: 18px; text-align: center; font-size: 12px; letter-spacing: .02em; color: var(--ink3); }
+    .side { width: 100%; max-width: 280px; justify-self: start; position: sticky; top: 24px; padding: 20px; border-radius: 18px; background: rgba(18,16,34,0.5); }
+    @media (max-width: 1240px) { .side { position: static; max-width: none; } .side.calc { grid-column: 1; grid-row: auto; justify-self: start; } }
+    .eyebrow { font-size: 11.5px; font-weight: 500; color: var(--acc); margin-bottom: 3px; }
+    .side-title { font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+    .side .field-label { font-size: 11.5px; margin-bottom: 6px; }
+    .side input[type="date"] { font-size: 14px; padding: 10px 12px; border-radius: 10px; }
+    .mini-list { display: grid; gap: 8px; margin-top: 14px; }
+    .side .row .tag { margin-bottom: 4px; font-size: 10.5px; color: var(--ink2); }
+    .mini-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .side .big { font-size: 19px; }
+    .side .dates { font-size: 11.5px; line-height: 1.4; opacity: .85; }
+    .side .actions { margin-top: 14px; }
+    .side .copy-all { padding: 10px; font-size: 13px; border-radius: 10px; font-weight: 400; background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.15); }
+    .side .copy-all:hover { background: rgba(255,255,255,0.13); }
+    .side .copy-all.done { background: var(--ok-bg); border-color: var(--ok-bd); }
+    .side details { margin-top: 10px; font-size: 12px; }
+    .side details pre { font-size: 12px; padding: 12px; }
+    .err { color: var(--no); font-size: 12.5px; margin-top: 10px; }
+    .side.calc { grid-column: 1; grid-row: 1; justify-self: end; }
+    .calc-input {
+      width: 100%; height: 190px; resize: none; display: block; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 10px; color: var(--ink); font-family: var(--mono); font-size: 12px; line-height: 1.55; padding: 10px 12px; outline: none;
+      transition: border-color .15s, background .15s, box-shadow .15s;
+    }
+    .calc-input::placeholder { color: var(--ink3); }
+    .calc-input:focus { border-color: rgba(var(--acc-rgb),0.7); background: rgba(255,255,255,0.08); box-shadow: 0 0 0 4px rgba(var(--acc-rgb),0.14); }
+    .calc-res { margin-top: 14px; }
+    .calc-res .big { font-size: 26px; overflow-wrap: anywhere; }
+    .calc-count { margin-top: 9px; padding-top: 9px; border-top: 1px dashed rgba(74,222,128,0.25); font-size: 12px; color: var(--ink2); }
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(8px);
-      background: rgba(15,17,23,0.9);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: var(--ink);
-      padding: 7px 18px;
-      border-radius: 100px;
-      font-family: var(--sans);
-      font-size: 12px;
-      letter-spacing: 0.03em;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s;
-      white-space: nowrap;
-      z-index: 99;
-      backdrop-filter: blur(12px);
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(8px);
+      background: rgba(15,17,23,0.92); border: 1px solid rgba(255,255,255,0.15); color: var(--ink);
+      padding: 8px 18px; border-radius: 100px; font-size: 12.5px; letter-spacing: 0.03em;
+      opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; white-space: nowrap; z-index: 99;
     }
-
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    @media (max-width: 520px) {
+      body { padding: 24px 12px; }
+      .card { padding: 22px 18px; }
+      .side { padding: 18px; }
+      .rows { grid-template-columns: 1fr; }
+      .actions { flex-direction: column; }
+      .ps { width: 38px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .aurora-blob, .ps { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -328,158 +204,386 @@
 <div class="noise"></div>
 
 <div class="wrap">
-  <div class="header">
+  <header class="header">
+    <button class="plane-box" id="planeBtn" type="button" aria-label="✈">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+    </button>
     <div>
       <div class="logo-name">DragonPass / LoungeKey</div>
-      <div class="logo-sub">Калькулятор дат</div>
+      <div class="logo-sub">Калькулятор транзакцій</div>
     </div>
-    <div class="plane-box">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-      </svg>
-    </div>
-  </div>
+  </header>
 
-  <div class="card">
-    <div class="field">
-      <label class="field-label">Тип картки</label>
-      <div class="field-ctrl">
-        <select id="cardType">
-          <option value="Visa">Visa</option>
-          <option value="MasterCard">MasterCard</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="field-label">Дата вильоту</label>
-      <div class="field-ctrl">
-        <input type="date" id="flightDate">
-      </div>
-    </div>
-
-    <hr>
-
-    <div class="results">
-      <div class="result-block ok" id="rbOk">
-        <div class="rb-head">
-          <span class="rb-tag">✓ Зараховується</span>
-          <button class="rb-copy" id="copyOk" disabled title="Копіювати">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          </button>
+<div class="layout">
+  <main class="main">
+    <div class="card main-card">
+      <div>
+        <label class="field-label" for="flightDate">Дата вильоту</label>
+        <div class="date-wrap">
+          <input type="date" id="flightDate">
         </div>
-        <div class="rb-sub">від 10 000 грн</div>
-        <div class="rb-value empty" id="valOk">—</div>
       </div>
 
-      <div class="result-block no" id="rbNo">
-        <div class="rb-head">
-          <span class="rb-tag">✗ Не зараховується</span>
-          <button class="rb-copy" id="copyNo" disabled title="Копіювати">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          </button>
+      <hr>
+
+      <div class="providers">
+      <section class="prov prov-visa">
+        <div class="prov-head">
+          <div class="prov-id">
+            <span class="ps" style="--r:-5deg" aria-hidden="true"><svg viewBox="0 0 64 40"><rect width="64" height="40" rx="9" fill="#F2F0EA"/><text x="37.5" y="27" text-anchor="middle" transform="skewX(-12)" font-family="'IBM Plex Sans',Arial,sans-serif" font-weight="700" font-size="19" letter-spacing="-0.5" fill="#1A1F71" stroke="#1A1F71" stroke-width=".6">VISA</text></svg></span>
+            <div class="prov-name">Visa <span>· DragonPass</span></div>
+          </div>
+          <button class="pill" data-copy="visa" disabled><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати</button>
         </div>
-        <div class="rb-sub">надто близько до вильоту</div>
-        <div class="rb-value empty" id="valNo">—</div>
+        <div class="rows">
+          <div class="row ok"><span class="tag">✓ Зараховується</span><div class="dates" id="ok-visa">—</div></div>
+          <div class="row no"><span class="tag">✗ Не зараховується</span><div class="dates" id="no-visa">—</div></div>
+        </div>
+        <p class="msg" id="msg-visa"></p>
+      </section>
+      <section class="prov prov-mc">
+        <div class="prov-head">
+          <div class="prov-id">
+            <span class="ps" style="--r:5deg" aria-hidden="true"><svg viewBox="0 0 64 40"><defs><clipPath id="mcL"><circle cx="25" cy="20" r="11"/></clipPath></defs><rect width="64" height="40" rx="9" fill="#F2F0EA"/><circle cx="25" cy="20" r="11" fill="#EB001B"/><circle cx="39" cy="20" r="11" fill="#F79E1B"/><circle cx="39" cy="20" r="11" fill="#FF5F00" clip-path="url(#mcL)"/></svg></span>
+            <div class="prov-name">MasterCard <span>· LoungeKey</span></div>
+          </div>
+          <button class="pill" data-copy="mc" disabled><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати</button>
+        </div>
+        <div class="rows">
+          <div class="row ok"><span class="tag">✓ Зараховується</span><div class="dates" id="ok-mc">—</div></div>
+          <div class="row no"><span class="tag">✗ Не зараховується</span><div class="dates" id="no-mc">—</div></div>
+        </div>
+        <p class="msg" id="msg-mc"></p>
+      </section>
+      </div>
+
+      <div class="actions">
+        <button class="copy-all" id="copyBoth" disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="14" height="14" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Копіювати обидві програми</button>
+        <button class="ghost" id="reword" title="Змінити тон і формулювання"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Інакше</button>
+      </div>
+
+      <details>
+        <summary>Переглянути текст для обох програм</summary>
+        <pre id="bothPreview"></pre>
+      </details>
+    </div>
+    <div class="foot">DragonPass · LoungeKey</div>
+  </main>
+
+  <aside class="card side" id="caseCard">
+    <div class="eyebrow">Додатково</div>
+    <div class="side-title">Скільки лишилось на витрати</div>
+    <label class="field-label" for="visitDate">Дата візиту</label>
+    <input type="date" id="visitDate">
+    <p class="err" id="caseErr" hidden></p>
+    <div class="mini-list">
+      <div class="row crow" id="cs-visa">
+        <span class="tag">Visa · DragonPass</span>
+        <div class="mini-line"><div class="big" id="cd-visa">—</div><div class="dates" id="ce-visa">—</div></div>
+      </div>
+      <div class="row crow" id="cs-mc">
+        <span class="tag">MasterCard · LoungeKey</span>
+        <div class="mini-line"><div class="big" id="cd-mc">—</div><div class="dates" id="ce-mc">—</div></div>
       </div>
     </div>
+    <div class="actions"><button class="copy-all" id="ccopyBoth">Копіювати відповідь</button></div>
+    <details>
+      <summary>Показати текст</summary>
+      <pre id="cBoth"></pre>
+    </details>
+  </aside>
 
-    <button class="copy-all" id="copyAll" disabled>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-      Копіювати все
-    </button>
-  </div>
-
-  <div class="foot">Кліринг MasterCard: Покупки враховуються не за датою в застосунку, а коли проходить фінальний розрахунок з магазином. Через це покупка може бути у виписці за потрібний період, але не врахуватись для доступу до бізнес-залу саме в день поїздки. Завжди перевіряйте доступність послуги в застосунку прямо перед вильотом</div>
+  <aside class="card side calc" id="calcCard">
+    <div class="eyebrow">Додатково</div>
+    <div class="side-title">Калькулятор витрат</div>
+    <textarea class="calc-input" id="dataInput" spellcheck="false" placeholder="Вставте рядки з виписки сюди..." aria-label="Рядки з виписки"></textarea>
+    <div class="actions"><button class="copy-all" id="calcBtn" type="button">Порахувати суму</button></div>
+    <div class="row ok calc-res" id="resultBox" hidden>
+      <span class="tag">Загальна сума списань</span>
+      <div class="big"><span id="totalSum">0.00</span> ₴</div>
+      <div class="calc-count" id="detailsText"></div>
+    </div>
+  </aside>
+</div>
 </div>
 
-<div class="toast" id="toast">Скопійовано</div>
-
+<div class="toast" id="toast"></div>
 <script>
-  const cardType = document.getElementById('cardType');
-  const flightDate = document.getElementById('flightDate');
-  const valOk = document.getElementById('valOk');
-  const valNo = document.getElementById('valNo');
-  const copyOk = document.getElementById('copyOk');
-  const copyNo = document.getElementById('copyNo');
-  const copyAll = document.getElementById('copyAll');
-  const toast = document.getElementById('toast');
+  const $ = id => document.getElementById(id);
+  const flightInput = $('flightDate'), toast = $('toast');
+  const AMOUNT = 20000;
+  const MONTHS = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+
+  const PROVIDERS = {
+    visa: { card: 'Visa',       prog: 'DragonPass', end: -6, span: 30 },
+    mc:   { card: 'MasterCard', prog: 'LoungeKey', end: -8, span: 30 }
+  };
+
+  const VARIANTS = 6;
+  let variant = Math.floor(Math.random() * VARIANTS);
+  let data = {};
 
   const now = new Date();
-  flightDate.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  flightInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
-  let state = { okText: '', noText: '', card: '' };
+  const parseLocal = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+  const shift = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const short = d => [String(d.getDate()).padStart(2,'0'), String(d.getMonth()+1).padStart(2,'0'), d.getFullYear()].join('.');
+  const money = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-  function fmt(d) {
-    return [String(d.getDate()).padStart(2,'0'), String(d.getMonth()+1).padStart(2,'0'), d.getFullYear()].join('.');
+  const long = (d, ref) => `${d.getDate()} ${MONTHS[d.getMonth()]}` + (d.getFullYear() !== ref.getFullYear() ? ` ${d.getFullYear()}` : '');
+
+  function compute(flight) {
+    const out = {};
+    for (const [k, p] of Object.entries(PROVIDERS)) {
+      const e = shift(flight, p.end);
+      const s = shift(e, -(p.span - 1));
+      out[k] = { ...p, s, e, ns: shift(e, 1), ne: flight, flight };
+    }
+    return out;
   }
 
-  function shift(str, n) {
-    const d = new Date(str);
-    d.setDate(d.getDate() + n);
-    return d;
+  function single(c, amt, v) {
+    const L = d => long(d, c.flight);
+    const f = L(c.flight), s = L(c.s), e = L(c.e), ns = L(c.ns), ne = L(c.ne);
+    return [
+      `${c.card} (${c.prog}): щоб потрапити в бізнес-зал на виліт ${f}, треба витратити від ${amt} грн з ${s} по ${e}. Витрати з ${ns} по ${ne} не рахуються.`,
+      `Якщо виліт ${f}, ${c.card} (${c.prog}): витратьте від ${amt} грн з ${s} по ${e} - і зал безкоштовний. З ${ns} по ${ne} витрати не рахуються.`,
+      `${c.card} · ${c.prog} ✈️ Виліт ${f}: витратьте від ${amt} грн з ${s} по ${e}, і зал безкоштовний. Витрати з ${ns} по ${ne} не рахуються.`,
+      `${c.card} (${c.prog}), виліт ${f}: треба витратити від ${amt} грн з ${s} по ${e}. З ${ns} по ${ne} витрати не рахуються.`,
+      `Зал на ${f} по ${c.card} (${c.prog}) буде безкоштовний, якщо з ${s} по ${e} витратити від ${amt} грн. Витрати з ${ns} по ${ne} не рахуються.`,
+      `${c.card} (${c.prog}): витратьте від ${amt} грн з ${s} по ${e}, і зал на ${f} безкоштовний. Покупки з ${ns} до вильоту не рахуються.`
+    ][v % VARIANTS];
   }
 
-  function calc() {
-    if (!flightDate.value) return;
-    let s, e;
-    if (cardType.value === 'Visa') {
-      s = shift(flightDate.value, -35);
-      e = shift(flightDate.value, -6);
-    } else {
-      e = shift(flightDate.value, -8);
-      s = new Date(e);
-      s.setDate(e.getDate() - 29);
+  function both(d, amt, v) {
+    const flight = d.visa.flight, L = x => long(x, flight);
+    const intro = [
+      `Щоб потрапити в бізнес-зал на виліт ${L(flight)}, треба витратити від ${amt} грн у такі дати:`,
+      `Щоб зал на ${L(flight)} був безкоштовний, треба витратити від ${amt} грн:`,
+      `Виліт ${L(flight)}: щоб потрапити в зал, витратьте від ${amt} грн:`,
+      `Бізнес-зал на ${L(flight)}: треба витратити від ${amt} грн. Дати по картках:`,
+      `Для залу на ${L(flight)} витратьте від ${amt} грн:`,
+      `Виліт ${L(flight)} ✈️ Щоб потрапити в зал, витратьте від ${amt} грн:`
+    ][v % VARIANTS];
+
+    const LINES = [
+      c => `💳 ${c.card} (${c.prog}): з ${L(c.s)} по ${L(c.e)}. З ${L(c.ns)} по ${L(c.ne)} витрати не рахуються.`,
+      c => `✈️ ${c.card} (${c.prog}) - з ${L(c.s)} по ${L(c.e)} включно. З ${L(c.ns)} по ${L(c.ne)} витрати не рахуються.`,
+      c => `🔹 ${c.card} (${c.prog}): з ${L(c.s)} по ${L(c.e)}. Покупки з ${L(c.ns)} до вильоту не рахуються.`,
+      c => `💳 ${c.card} (${c.prog}): рахуються витрати з ${L(c.s)} по ${L(c.e)}. З ${L(c.ns)} по ${L(c.ne)} - ні.`,
+      c => `✨ ${c.card} (${c.prog}): витрачайте з ${L(c.s)} по ${L(c.e)}. З ${L(c.ns)} по ${L(c.ne)} витрати не рахуються.`,
+      c => `🎫 ${c.card} (${c.prog}): з ${L(c.s)} по ${L(c.e)}. Покупки з ${L(c.ns)} по ${L(c.ne)} не рахуються.`
+    ];
+    const n = LINES.length;
+    const lineVisa = LINES[v % n](d.visa);
+    const lineMc   = LINES[(v + 3) % n](d.mc);
+
+    const outro = [
+      'Краще не відкладати з покупками, щоб за був доступний😊',
+      'Покупки ближче до вильоту не рахуються, тому краще витратити раніше ✈️',
+      'Якщо плануєте покупки - врахуйте ці дати🙂',
+      'Краще зробити покупки до цих дат - тоді все врахується 😊',
+      'Якщо є що купити, краще зробити це раніше 🙂',
+      'Якщо необхідний обіг буде у вказані періоди - зал точно буде доступний 🛫'
+    ][(v + 2) % VARIANTS];
+    return [intro, '', lineVisa, lineMc, '', outro].join('\n');
+  }
+
+  function render() {
+    const amount = AMOUNT;
+    const ok = !!flightInput.value;
+    document.querySelectorAll('[data-copy], #copyBoth').forEach(b => b.disabled = !ok);
+    if (!ok) return;
+
+    const flight = parseLocal(flightInput.value);
+    data = compute(flight);
+    const amt = money(amount);
+
+    for (const k of Object.keys(data)) {
+      const c = data[k];
+      $('ok-' + k).textContent = `${short(c.s)} —\n${short(c.e)}`;
+      $('no-' + k).textContent = `${short(c.ns)} —\n${short(c.ne)}`;
+      $('msg-' + k).textContent = single(c, amt, variant);
+    }
+    $('bothPreview').textContent = both(data, amt, variant);
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (_) {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (_) {}
+      ta.remove(); return ok;
+    }
+  }
+
+  let toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg; toast.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
+  function flash(btn) {
+    const orig = btn.innerHTML;
+    btn.classList.add('done'); btn.textContent = '✓ Готово';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = orig; }, 1500);
+  }
+
+  document.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
+    const k = btn.dataset.copy, c = data[k];
+    const text = $('msg-' + k).textContent;
+    if (await copyText(text)) { flash(btn); showToast(`${c.card} скопійовано ✓`); }
+    else showToast('Не вдалося скопіювати');
+  }));
+
+  $('copyBoth').addEventListener('click', async () => {
+    if (await copyText($('bothPreview').textContent)) showToast('Обидві програми скопійовано ✓');
+    else showToast('Не вдалося скопіювати');
+  });
+
+  $('reword').addEventListener('click', () => { variant = (variant + 1) % VARIANTS; render(); showToast('Нове формулювання'); });
+  flightInput.addEventListener('change', render);
+  render();
+
+  const visitInput = $('visitDate');
+  visitInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const getToday = () => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); };
+  const diff = (a, b) => Math.round((a - b) / 86400000);
+  const dayWord = n => { const m = n % 100, l = n % 10; return (m > 10 && m < 20) ? 'днів' : l === 1 ? 'день' : (l >= 2 && l <= 4) ? 'дні' : 'днів'; };
+  let caseText = '';
+  function caseRender() {
+    const err = $('caseErr'), out = $('cBoth');
+    const bad = msg => { err.hidden = false; err.textContent = msg; out.textContent = ''; caseText = ''; };
+    if (!visitInput.value) return bad('Вкажіть дату візиту.');
+    const today = getToday(), visit = parseLocal(visitInput.value);
+    if (visit < today) return bad('Дата візиту вже в минулому.');
+    err.hidden = true;
+    const V = long(visit, visit), amt = money(AMOUNT), lines = []; let closed = 0;
+    for (const [k, p] of Object.entries(PROVIDERS)) {
+      const e = shift(visit, p.end), s0 = shift(e, -(p.span - 1));
+      const left = diff(e, today) + 1;
+      const L = d => long(d, visit), name = `${p.card} (${p.prog})`;
+      let cls, big, line;
+      if (left <= 0) {
+        cls = 'no'; big = '0';
+        closed++;
+        line = `• ${name} - період закінчився ${L(e)}`;
+      } else if (today < s0) {
+        cls = 'warn'; big = 'з ' + short(s0);
+        line = `• ${name} - витрати рахуються з ${L(s0)} по ${L(e)} включно`;
+      } else {
+        cls = left <= 3 ? 'warn' : 'ok'; big = `${left} ${dayWord(left)}`;
+        line = `• ${name} - до ${L(e)} включно (${left === 1 ? 'сьогодні останній день' : 'лишилось ' + left + ' ' + dayWord(left)})`;
+      }
+      $('cs-' + k).className = 'row crow ' + cls;
+      $('cd-' + k).textContent = big;
+      $('ce-' + k).textContent = left <= 0 ? 'закрито ' + short(e) : 'до ' + short(e);
+      lines.push(line);
+    }
+    const head = closed === lines.length
+      ? `На жаль, період для витрат від ${amt} грн вже завершився - нові покупки на цей виліт не потраплять у залік:`
+      : `Якщо виліт ${V}, щоб бізнес-зал був доступний, треба витратити від ${amt} грн:`;
+    caseText = head + (closed === lines.length ? '\n\n' : '\n') + lines.join('\n');
+    out.textContent = caseText;
+  }
+  $('ccopyBoth').addEventListener('click', async () => {
+    if (caseText && await copyText(caseText)) { flash($('ccopyBoth')); showToast('Відповідь скопійовано ✓'); } else showToast('Немає що копіювати');
+  });
+  visitInput.addEventListener('change', caseRender);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) caseRender(); });
+  caseRender();
+
+  const planeBtn = document.getElementById('planeBtn');
+  planeBtn.addEventListener('click', () => {
+    planeBtn.classList.remove('spinning');
+    void planeBtn.offsetWidth;
+    planeBtn.classList.add('spinning');
+    planeBtn.addEventListener('animationend', () => planeBtn.classList.remove('spinning'), { once: true });
+  });
+
+  function stripTrailingCurrency(line) {
+    let s = line.trim();
+    const currencyRe = /(uah|грн\.?|₴)\s*$/i;
+    let prev;
+    do {
+      prev = s;
+      s = s.replace(currencyRe, '').trim();
+    } while (s !== prev);
+    return s;
+  }
+
+  function normalizeAmount(raw) {
+    let s = raw.trim();
+    s = s.replace(/[\s  ]/g, '');
+
+    let sign = '';
+    if (s[0] === '+' || s[0] === '-') {
+      sign = s[0];
+      s = s.slice(1);
     }
 
-    const noStart = new Date(e); noStart.setDate(e.getDate() + 1);
-    const noEnd = new Date(flightDate.value);
+    const seps = [...s.matchAll(/[.,]/g)];
+    if (seps.length === 0) {
+      return parseFloat(sign + s);
+    }
 
-    state = {
-      okText: `${fmt(s)} — ${fmt(e)}`,
-      noText: `${fmt(noStart)} — ${fmt(noEnd)}`,
-      card: cardType.value
-    };
+    const last = seps[seps.length - 1];
+    const afterLast = s.slice(last.index + 1);
 
-    valOk.textContent = `${fmt(s)} —\n${fmt(e)}`;
-    valNo.textContent = `${fmt(noStart)} —\n${fmt(noEnd)}`;
-    valOk.classList.remove('empty');
-    valNo.classList.remove('empty');
-    copyOk.disabled = false;
-    copyNo.disabled = false;
-    copyAll.disabled = false;
+    if (!/^\d{1,2}$/.test(afterLast)) {
+      const intPart = s.replace(/[.,]/g, '');
+      return parseFloat(sign + intPart);
+    }
+
+    const intPart = s.slice(0, last.index).replace(/[.,]/g, '');
+    const fracPart = afterLast;
+    return parseFloat(sign + intPart + '.' + fracPart);
   }
 
-  function showToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 1800);
+  const CANCEL_RE = /скасуван/i;
+  const DATE_RE = /(?<!\d)\d{1,2}[./]\d{1,2}[./]\d{2,4}(?!\d)|(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)/g;
+  const TIME_RE = /(?<!\d)\d{1,2}:\d{2}(?::\d{2})?(?!\d)/g;
+
+  const NUMBER_RE = /(?<!\S)([+-]?(?:\d{1,3}(?:[\s  .,]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)?))\s*$/;
+
+  function calculate() {
+    const text = document.getElementById('dataInput').value;
+    const lines = text.split('\n');
+    let total = 0;
+    let validLines = 0;
+
+    lines.forEach(line => {
+      line = line.trim();
+      if (!line) return;
+
+      const stripped = stripTrailingCurrency(line.replace(/[−–]/g, '-').replace(DATE_RE, ' ').replace(TIME_RE, ' '));
+      const match = stripped.match(NUMBER_RE);
+
+      if (match) {
+        const num = normalizeAmount(match[1]);
+
+        if (!isNaN(num) && CANCEL_RE.test(line)) {
+          total -= Math.abs(num);
+        } else if (!isNaN(num) && num < 0) {
+          total += Math.abs(num);
+          validLines++;
+        }
+      }
+    });
+
+    const formattedTotal = total.toLocaleString('uk-UA', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    document.getElementById('totalSum').innerText = formattedTotal;
+    document.getElementById('detailsText').innerText = `Оброблено транзакцій: ${validLines}`;
+    document.getElementById('resultBox').hidden = false;
   }
-
-  function flashBtn(btn) {
-    const orig = btn.innerHTML;
-    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-    setTimeout(() => { btn.innerHTML = orig; }, 1500);
-  }
-
-  copyOk.addEventListener('click', () => {
-    navigator.clipboard.writeText(`${state.card}: Треба витратити від 10 000 грн у період: ${state.okText}`)
-      .then(() => { flashBtn(copyOk); showToast('Скопійовано'); });
-  });
-
-  copyNo.addEventListener('click', () => {
-    navigator.clipboard.writeText(`${state.card}: З ${state.noText.replace(' — ', ' по ')} витрати не рахуватимуться`)
-      .then(() => { flashBtn(copyNo); showToast('Скопійовано'); });
-  });
-
-  copyAll.addEventListener('click', () => {
-    navigator.clipboard.writeText(`${state.card}: Треба витратити від 10 000 грн у період: ${state.okText}\nА з ${state.noText.replace(' — ', ' по ')} витрати не рахуватимуться`)
-      .then(() => showToast('Все скопійовано ✓'));
-  });
-
-  cardType.addEventListener('change', calc);
-  flightDate.addEventListener('change', calc);
-  calc();
+  document.getElementById('calcBtn').addEventListener('click', calculate);
 </script>
 </body>
 </html>
