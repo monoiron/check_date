@@ -329,7 +329,7 @@
   const parseLocal = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
   const shift = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const short = d => [String(d.getDate()).padStart(2,'0'), String(d.getMonth()+1).padStart(2,'0'), d.getFullYear()].join('.');
-  const money = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const money = n => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
   const long = (d, ref) => `${d.getDate()} ${MONTHS[d.getMonth()]}` + (d.getFullYear() !== ref.getFullYear() ? ` ${d.getFullYear()}` : '');
 
@@ -357,37 +357,30 @@
   }
 
   function both(d, amt, v) {
-    const flight = d.visa.flight, L = x => long(x, flight);
-    const intro = [
-      `Щоб потрапити в бізнес-зал на виліт ${L(flight)}, треба витратити від ${amt} грн у такі дати:`,
-      `Щоб зал на ${L(flight)} був безкоштовний, треба витратити від ${amt} грн:`,
-      `Виліт ${L(flight)}: щоб потрапити в зал, витратьте від ${amt} грн:`,
-      `Бізнес-зал на ${L(flight)}: треба витратити від ${amt} грн. Дати по картках:`,
-      `Для залу на ${L(flight)} витратьте від ${amt} грн:`,
-      `Виліт ${L(flight)} ✈️ Щоб потрапити в зал, витратьте від ${amt} грн:`
-    ][v % VARIANTS];
+    const flight = d.visa.flight;
+    const L = x => long(x, flight);
+    const fDate = L(flight);
 
-    const LINES = [
-      c => `💳 ${c.card} (${c.prog}): з ${L(c.s)} по ${L(c.e)}. З ${L(c.ns)} по ${L(c.ne)} витрати не рахуються.`,
-      c => `✈️ ${c.card} (${c.prog}) - з ${L(c.s)} по ${L(c.e)} включно. З ${L(c.ns)} по ${L(c.ne)} витрати не рахуються.`,
-      c => `🔹 ${c.card} (${c.prog}): з ${L(c.s)} по ${L(c.e)}. Покупки з ${L(c.ns)} до вильоту не рахуються.`,
-      c => `💳 ${c.card} (${c.prog}): рахуються витрати з ${L(c.s)} по ${L(c.e)}. З ${L(c.ns)} по ${L(c.ne)} - ні.`,
-      c => `✨ ${c.card} (${c.prog}): витрачайте з ${L(c.s)} по ${L(c.e)}. З ${L(c.ns)} по ${L(c.ne)} витрати не рахуються.`,
-      c => `🎫 ${c.card} (${c.prog}): з ${L(c.s)} по ${L(c.e)}. Покупки з ${L(c.ns)} по ${L(c.ne)} не рахуються.`
+    // Intro line — варіюється формулювання
+    const introVariants = [
+      `Виліт ${fDate} ✈️ Щоб потрапити в зал, потрібен обіг від ${amt} грн:`,
+      `Виліт ${fDate} ✈️ Для доступу в зал потрібен обіг від ${amt} грн:`,
+      `✈️ Виліт ${fDate}. Щоб зал був доступний, потрібен обіг від ${amt} грн:`,
+      `Виліт ${fDate} ✈️ Обіг від ${amt} грн — і зал безкоштовний:`,
+      `✈️ ${fDate} — для залу потрібен обіг від ${amt} грн:`,
+      `Виліт ${fDate} ✈️ Потрібен обіг від ${amt} грн для безкоштовного залу:`
     ];
-    const n = LINES.length;
-    const lineVisa = LINES[v % n](d.visa);
-    const lineMc   = LINES[(v + 3) % n](d.mc);
+    const intro = introVariants[v % introVariants.length];
 
-    const outro = [
-      'Краще не відкладати з покупками, щоб за був доступний😊',
-      'Покупки ближче до вильоту не рахуються, тому краще витратити раніше ✈️',
-      'Якщо плануєте покупки - врахуйте ці дати🙂',
-      'Краще зробити покупки до цих дат - тоді все врахується 😊',
-      'Якщо є що купити, краще зробити це раніше 🙂',
-      'Якщо необхідний обіг буде у вказані періоди - зал точно буде доступний 🛫'
-    ][(v + 2) % VARIANTS];
-    return [intro, '', lineVisa, lineMc, '', outro].join('\n');
+    // Visa рядок
+    const visaC = d.visa;
+    const visaLine = `🎫 Visa (DragonPass): з ${L(visaC.s)} по ${L(visaC.e)}. \nПокупки з ${L(visaC.ns)} по ${L(visaC.ne)} вже не враховуються`;
+
+    // MasterCard рядок
+    const mcC = d.mc;
+    const mcLine = `🔹 MasterCard (LoungeKey): з ${L(mcC.s)} по ${L(mcC.e)}. \nПокупки з ${L(mcC.ns)} по ${L(mcC.ne)} вже не враховуються`;
+
+    return [intro, '', visaLine, '', mcLine].join('\n');
   }
 
   function render() {
@@ -517,7 +510,7 @@
 
   function normalizeAmount(raw) {
     let s = raw.trim();
-    s = s.replace(/[\s  ]/g, '');
+    s = s.replace(/[\s  ]/g, '');
 
     let sign = '';
     if (s[0] === '+' || s[0] === '-') {
@@ -547,7 +540,7 @@
   const DATE_RE = /(?<!\d)\d{1,2}[./]\d{1,2}[./]\d{2,4}(?!\d)|(?<!\d)\d{4}-\d{2}-\d{2}(?!\d)/g;
   const TIME_RE = /(?<!\d)\d{1,2}:\d{2}(?::\d{2})?(?!\d)/g;
 
-  const NUMBER_RE = /(?<!\S)([+-]?(?:\d{1,3}(?:[\s  .,]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)?))\s*$/;
+  const NUMBER_RE = /(?<!\S)([+-]?(?:\d{1,3}(?:[\s  .,]\d{3})+(?:[.,]\d{1,2})?|\d+(?:[.,]\d+)?))\s*$/;
 
   function calculate() {
     const text = document.getElementById('dataInput').value;
